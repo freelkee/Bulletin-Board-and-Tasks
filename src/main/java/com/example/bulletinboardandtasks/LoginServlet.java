@@ -1,7 +1,7 @@
 package com.example.bulletinboardandtasks;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +12,7 @@ import java.sql.*;
 @WebServlet(name = "Login", value = "/login")
 
 public class LoginServlet extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");
@@ -28,36 +28,55 @@ public class LoginServlet extends HttpServlet {
         out.println("</html>");
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         // check if the username and password are valid
         boolean isValid = isValidUser(username, password);
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html>");
+
         if (isValid) {
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
-            out.println("<html>");
             out.println("<head><title>Login Successful</title></head>");
             out.println("<body>");
             out.println("<h1>Login Successful</h1>");
             out.println("<p>Welcome back, " + username + ".</p>");
-            out.println("</body>");
-            out.println("</html>");
+
+            Cookie authCookie = new Cookie("auth", "true");
+            authCookie.setMaxAge(60 * 60 * 24); // устанавливаем срок действия cookie на 1 день
+            response.addCookie(authCookie);
+
+            out.println("<form action=\"secure.jsp\" method=\"get\">");
+            out.println("<input type=\"submit\" value=\"Ok\">");
+            out.println("</form>");
+
+
         } else {
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
-            out.println("<html>");
             out.println("<head><title>Login Failed</title></head>");
             out.println("<body>");
             out.println("<h1>Login Failed</h1>");
             out.println("<p>Invalid username or password.</p>");
-            out.println("</body>");
-            out.println("</html>");
+
+            out.println("<form action=\"login\" method=\"get\">");
+            out.println("<input type=\"submit\" value=\"Try again\">");
+            out.println("</form>");
         }
+        out.println("</body>");
+        out.println("</html>");
     }
 
     public boolean isValidUser(String username, String password) {
+
         boolean isValid = false;
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
 
         Connection conn = null;
@@ -88,6 +107,6 @@ public class LoginServlet extends HttpServlet {
             }
         }
         return isValid;
-
     }
+
 }

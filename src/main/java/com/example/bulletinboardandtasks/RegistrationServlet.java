@@ -1,6 +1,5 @@
 package com.example.bulletinboardandtasks;
 
-import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
@@ -11,16 +10,16 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-@WebServlet(name = "RegistrationPage", value = "/registration-page")
+@WebServlet(name = "RegistrationPage", value = "/registration")
 public class RegistrationServlet extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");
         out.println("<head><title>User Registration</title></head>");
         out.println("<body>");
         out.println("<h1>User Registration</h1>");
-        out.println("<form action=\"registration-page\" accept-charset =\"uft-8\" method=\"post\">");
+        out.println("<form action=\"registration\" accept-charset =\"uft-8\" method=\"post\">");
         out.println("Username: <input type=\"text\" name=\"username\" required><br>");
         out.println("Password: <input type=\"password\" name=\"password\" required><br>");
         out.println("<input type=\"submit\" value=\"Register\">");
@@ -29,32 +28,36 @@ public class RegistrationServlet extends HttpServlet {
         out.println("</html>");
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
+        out.println("<html>");
 
         if(saveUser(username,password)) {
-
-            out.println("<html>");
             out.println("<head><title>Registration Successful</title></head>");
             out.println("<body>");
             out.println("<h1>Registration Successful</h1>");
             out.println("<p>Thank you for registering, " + username + ".</p>");
-            out.println("</body>");
-            out.println("</html>");
+
+            out.println("<form action=\"login\" method=\"get\">");
+            out.println("<input type=\"submit\" value=\"Login\">");
+            out.println("</form>");
         }
         else{
-            out.println("<html>");
             out.println("<head><title>Registration Failed</title></head>");
             out.println("<body>");
             out.println("<h1>Registration Failed</h1>");
             out.println("<p>Try using a different username.</p>");
-            out.println("</body>");
-            out.println("</html>");
+
+            out.println("<form action=\"registration\" method=\"get\">");
+            out.println("<input type=\"submit\" value=\"Try again\">");
+            out.println("</form>");
         }
+        out.println("</body>");
+        out.println("</html>");
     }
 
 
