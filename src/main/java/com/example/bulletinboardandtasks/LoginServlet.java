@@ -1,10 +1,9 @@
 package com.example.bulletinboardandtasks;
 
+
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
@@ -12,54 +11,63 @@ import java.sql.*;
 @WebServlet(name = "Login", value = "/login")
 
 public class LoginServlet extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("text/html;charset=UTF-8");
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");
         out.println("<head><title>User Login</title></head>");
         out.println("<body>");
+
+        request.getRequestDispatcher("header.jsp").include(request, response);
+
         out.println("<h1>User Login</h1>");
         out.println("<form action=\"login\" method=\"post\">");
-        out.println("Username: <input type=\"text\" name=\"username\"><br>");
-        out.println("Password: <input type=\"password\" name=\"password\"><br>");
-        out.println("<input type=\"submit\" value=\"Login\">");
+        out.println("Имя пользователя: <input type=\"text\" name=\"username\"><br>");
+        out.println("Пароль: <input type=\"password\" name=\"password\"><br>");
+        out.println("<input type=\"submit\" value=\"Войти\">");
         out.println("</form>");
         out.println("</body>");
         out.println("</html>");
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        // check if the username and password are valid
-        boolean isValid = isValidUser(username, password);
-        response.setContentType("text/html");
+
+        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.println("<html>");
 
-        if (isValid) {
-            out.println("<head><title>Login Successful</title></head>");
+        if (isValidUser(username, password)) {
+            out.println("<head><title>Вход в систему выполнен успешно</title></head>");
             out.println("<body>");
-            out.println("<h1>Login Successful</h1>");
-            out.println("<p>Welcome back, " + username + ".</p>");
 
-            Cookie authCookie = new Cookie("auth", "true");
-            authCookie.setMaxAge(60 * 60 * 24); // устанавливаем срок действия cookie на 1 день
-            response.addCookie(authCookie);
+            HttpSession session = request.getSession();
+            session.setAttribute("auth", "true");
+            session.setMaxInactiveInterval(60*60);
 
-            out.println("<form action=\"secure.jsp\" method=\"get\">");
-            out.println("<input type=\"submit\" value=\"Ok\">");
+            request.getRequestDispatcher("header.jsp").include(request, response);
+
+            out.println("<h1>Вход в систему выполнен успешно</h1>");
+            out.println("<p>Добро пожаловать, " + username + ".</p>");
+
+            out.println("<form action=\"personal_account\" method=\"get\">");
+            out.println("<input type=\"submit\" value=\"Войти в личный кабинет\">");
             out.println("</form>");
 
 
         } else {
-            out.println("<head><title>Login Failed</title></head>");
+            out.println("<head><title>Ошибка входа</title></head>");
             out.println("<body>");
-            out.println("<h1>Login Failed</h1>");
-            out.println("<p>Invalid username or password.</p>");
+
+            request.getRequestDispatcher("header.jsp").include(request, response);
+
+            out.println("<h1>Ошибка входа</h1>");
+            out.println("<p>Неверное имя пользователя или пароль.</p>");
 
             out.println("<form action=\"login\" method=\"get\">");
-            out.println("<input type=\"submit\" value=\"Try again\">");
+            out.println("<input type=\"submit\" value=\"Повторить попытку\">");
             out.println("</form>");
         }
         out.println("</body>");
