@@ -40,7 +40,7 @@ public class PersonalAccountServlet extends HttpServlet {
             out.println("</html>");
         } else {
             out.println("<h1>Вы не авторизованы. Повторите попытку после входа в систему.</h1>");
-            response.sendRedirect("<a href=\"index.jsp\">Вернуться на главную страницу</a>");
+            response.sendRedirect("<a href=\"main.jsp\">Вернуться на главную страницу</a>");
         }
     }
 }

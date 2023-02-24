@@ -11,7 +11,7 @@ public class LogoutServlet extends HttpServlet {
         session.setAttribute("auth","false");
 
         // Перенаправляем пользователя на страницу входа
-        response.sendRedirect("index.jsp");
+        response.sendRedirect("main.jsp");
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -39,7 +39,7 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.println("<html>");
 
-        if (isValidUser(username, password)) {
+        if (isValidUser(username, password,response)) {
             out.println("<head><title>Вход в систему выполнен успешно</title></head>");
             out.println("<body>");
 
@@ -74,7 +74,9 @@ public class LoginServlet extends HttpServlet {
         out.println("</html>");
     }
 
-    public boolean isValidUser(String username, String password) {
+    public boolean isValidUser(String username, String password, HttpServletResponse response) throws IOException {
+
+        PrintWriter out = response.getWriter();
 
         boolean isValid = false;
 
@@ -111,7 +113,8 @@ public class LoginServlet extends HttpServlet {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                out.println("<h3>SQL Exception:</h3>");
+                out.println("<p>" + e.getMessage() + "</p>");
             }
         }
         return isValid;

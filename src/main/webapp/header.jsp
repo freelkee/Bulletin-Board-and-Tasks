@@ -75,7 +75,7 @@
 </div>
 
 <ul>
-    <li><a class="active" href="index.jsp">Главная</a></li>
+    <li><a class="active" href="main.jsp">Главная</a></li>
     <li><a href="#">О нас</a></li>
     <li><a href="#">Контакты</a></li>
 </ul>
