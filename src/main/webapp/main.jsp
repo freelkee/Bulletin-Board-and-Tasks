@@ -18,10 +18,13 @@
 <p>Также вы можете найти или опубликовать задания на различные виды работ, включая уборку, покупкой товаров, переводы и
     многое другое.</p>
 
+
+<jsp:include page="tasktable"/>
 <% if (!request.getSession().getAttribute("auth").equals("true")) {%>
 <p>Для принятия учистия в сервисе необходимо авторизоваться или зарегистрироваться.</p>
+<%}else {%>
+<jsp:include page="button.jsp"/>
 <%}%>
-<jsp:include page="tasktable"/>
 <%--
 <% if (!request.getSession().getAttribute("auth").equals("true")) {%>
 

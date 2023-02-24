@@ -12,6 +12,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static com.example.bulletinboardandtasks.TaskTableServlet.closeConnection;
+
 @WebServlet(name = "RegistrationPage", value = "/registration")
 public class RegistrationServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -25,7 +27,7 @@ public class RegistrationServlet extends HttpServlet {
         request.getRequestDispatcher("header.jsp").include(request, response);
 
         out.println("<h1>Регистрация пользователя</h1>");
-        out.println("<form action=\"registration\" accept-charset =\"uft-8\" method=\"post\">");
+        out.println("<form action=\"registration\" method=\"post\" accept-charset =\"UTF-8\">");
         out.println("Имя пользователя: <input type=\"text\" name=\"username\" required><br>");
         out.println("Пароль: <input type=\"password\" name=\"password\" required><br>");
         out.println("<input type=\"submit\" value=\"Зарегистрироваться \">");
@@ -39,6 +41,8 @@ public class RegistrationServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+
         PrintWriter out = response.getWriter();
         out.println("<html>");
 
@@ -49,9 +53,9 @@ public class RegistrationServlet extends HttpServlet {
             request.getRequestDispatcher("header.jsp").include(request, response);
 
             out.println("<h1>Регистрация прошла успешно</h1>");
-            out.println("<p>Thank you for registering, " + username + ".</p>");
+            out.println("<p>Спасибо за регистрацию, " + username + ".</p>");
 
-            out.println("<form action=\"login\" method=\"get\">");
+            out.println("<form action=\"login\" method=\"get\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Войти\">");
             out.println("</form>");
         }
@@ -64,7 +68,7 @@ public class RegistrationServlet extends HttpServlet {
             out.println("<h1>Ошибка регистрации</h1>");
             out.println("<p>Попробуйте использовать другое имя пользователя.</p>");
 
-            out.println("<form action=\"registration\" method=\"get\">");
+            out.println("<form action=\"registration\" method=\"get\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Повторить\">");
             out.println("</form>");
         }
@@ -86,7 +90,7 @@ public class RegistrationServlet extends HttpServlet {
         try {
             // Connect to the database
             conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
+                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
                     "postgres"," ");
 
             // Create the SQL statement
@@ -103,17 +107,7 @@ public class RegistrationServlet extends HttpServlet {
             e.printStackTrace();
             return false;
         } finally {
-            // Close the statement and connection
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            closeConnection(new PrintWriter(System.out), conn, stmt);
         }
     }
 }

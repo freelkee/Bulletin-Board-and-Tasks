@@ -16,13 +16,13 @@ public class LoginServlet extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");
-        out.println("<head><title>User Login</title></head>");
+        out.println("<head><title>Авторизация</title></head>");
         out.println("<body>");
 
         request.getRequestDispatcher("header.jsp").include(request, response);
 
         out.println("<h1>User Login</h1>");
-        out.println("<form action=\"login\" method=\"post\">");
+        out.println("<form action=\"login\" method=\"post\" accept-charset=\"UTF-8\"> ");
         out.println("Имя пользователя: <input type=\"text\" name=\"username\"><br>");
         out.println("Пароль: <input type=\"password\" name=\"password\"><br>");
         out.println("<input type=\"submit\" value=\"Войти\">");
@@ -46,13 +46,14 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("auth", "true");
             session.setMaxInactiveInterval(60*60);
+            session.setAttribute("username",username);
 
             request.getRequestDispatcher("header.jsp").include(request, response);
 
             out.println("<h1>Вход в систему выполнен успешно</h1>");
             out.println("<p>Добро пожаловать, " + username + ".</p>");
 
-            out.println("<form action=\"personal_account\" method=\"get\">");
+            out.println("<form action=\"personal_account\" method=\"get\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Войти в личный кабинет\">");
             out.println("</form>");
 
@@ -66,7 +67,7 @@ public class LoginServlet extends HttpServlet {
             out.println("<h1>Ошибка входа</h1>");
             out.println("<p>Неверное имя пользователя или пароль.</p>");
 
-            out.println("<form action=\"login\" method=\"get\">");
+            out.println("<form action=\"login\" method=\"get\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Повторить попытку\">");
             out.println("</form>");
         }
@@ -105,17 +106,7 @@ public class LoginServlet extends HttpServlet {
             e.printStackTrace();
         } finally {
             // Close the statement and connection
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                out.println("<h3>SQL Exception:</h3>");
-                out.println("<p>" + e.getMessage() + "</p>");
-            }
+            TaskTableServlet.closeConnection(out, conn, stmt);
         }
         return isValid;
     }

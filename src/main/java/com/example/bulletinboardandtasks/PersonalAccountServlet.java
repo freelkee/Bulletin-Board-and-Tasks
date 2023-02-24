@@ -18,29 +18,27 @@ public class PersonalAccountServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<meta charset=\"UTF-8\">");
+        out.println("<title>Личный кабинет</title>");
+        out.println("</head>");
+        out.println("<body>");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("header.jsp");
+        dispatcher.include(request, response);
+
         HttpSession session = request.getSession();
         if (session.getAttribute("auth") != null && session.getAttribute("auth").equals("true")) {
 
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<meta charset=\"UTF-8\">");
-            out.println("<title>Личный кабинет</title>");
-            out.println("</head>");
-            out.println("<body>");
-
-            RequestDispatcher dispatcher = request.getRequestDispatcher("header.jsp");
-            dispatcher.include(request, response);
-
             out.println("<h1>Добро пожаловать в личный кабинет!</h1>");
-
             out.println("<p>Вот некоторая совершенно секретная информация, которую можете видеть только вы...</p>");
 
-            out.println("</body>");
-            out.println("</html>");
         } else {
             out.println("<h1>Вы не авторизованы. Повторите попытку после входа в систему.</h1>");
             response.sendRedirect("<a href=\"main.jsp\">Вернуться на главную страницу</a>");
         }
+        out.println("</body>");
+        out.println("</html>");
     }
 }
