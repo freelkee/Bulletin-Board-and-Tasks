@@ -13,6 +13,8 @@ import java.sql.*;
 public class LoginServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");
@@ -32,12 +34,14 @@ public class LoginServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
-        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.println("<html>");
+
 
         if (isValidUser(username, password,response)) {
             out.println("<head><title>Вход в систему выполнен успешно</title></head>");

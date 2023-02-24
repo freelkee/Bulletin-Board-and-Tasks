@@ -18,6 +18,7 @@ import static com.example.bulletinboardandtasks.TaskTableServlet.closeConnection
 public class RegistrationServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
         out.println("<html>");
@@ -27,7 +28,7 @@ public class RegistrationServlet extends HttpServlet {
         request.getRequestDispatcher("header.jsp").include(request, response);
 
         out.println("<h1>Регистрация пользователя</h1>");
-        out.println("<form action=\"registration\" method=\"post\" accept-charset =\"UTF-8\">");
+        out.println("<form action=\"registration\" method=\"post\" accept-charset=\"UTF-8\">");
         out.println("Имя пользователя: <input type=\"text\" name=\"username\" required><br>");
         out.println("Пароль: <input type=\"password\" name=\"password\" required><br>");
         out.println("<input type=\"submit\" value=\"Зарегистрироваться \">");
@@ -37,11 +38,11 @@ public class RegistrationServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
+
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
 
         PrintWriter out = response.getWriter();
         out.println("<html>");

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/tasktable")
 public class TaskTableServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
