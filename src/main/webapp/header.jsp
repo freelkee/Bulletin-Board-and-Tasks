@@ -66,7 +66,7 @@
     <%
         if (request.getSession().getAttribute("auth") != null && request.getSession().getAttribute("auth").equals("true")){
     %>
-    <li><a href="personal_account">Личный кабинет</a></li>
+    <a href="personal_account">Личный кабинет</a>
     <a href="logout">Выйти</a>
     <%} else {%>
     <a href="login">Войти</a>

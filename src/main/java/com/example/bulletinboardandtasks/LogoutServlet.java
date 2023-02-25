@@ -11,6 +11,7 @@ public class LogoutServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         session.setAttribute("auth","false");
+        session.setAttribute("username","unknown");
 
         // Перенаправляем пользователя на страницу входа
         response.sendRedirect("main.jsp");

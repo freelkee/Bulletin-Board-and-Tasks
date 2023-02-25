@@ -17,7 +17,7 @@
 <div id="form" style="display: none;">
     <form action="tasktable" method="post" accept-charset="UTF-8">
         <label for="name">Наименование:</label>
-        <input type="text" id="name" name="name"><br>
+        <input type="text" id="name" name="name" required><br>
 
         <label for="subtasks">Подзадачи:</label>
         <textarea id="subtasks" name="subtasks"></textarea><br>

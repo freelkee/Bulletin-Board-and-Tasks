@@ -1,23 +1,22 @@
 package com.example.bulletinboardandtasks;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/tasktable")
 public class TaskTableServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -25,13 +24,27 @@ public class TaskTableServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
-        String name = request.getParameter("name");
-        String subtasks = request.getParameter("subtasks");
-        String assignee = request.getParameter("assignee");
+
+
+        String name = request.getParameter("name").trim();
+        String subtasks = request.getParameter("subtasks").trim();
+        String assignee = request.getParameter("assignee").trim();
+
+        if (!checkAssigneeUser(assignee, out) && !assignee.equals("")) {
+            out.println("<html>");
+            out.println("<head><title>Ошибка данных</title></head>");
+            out.println("<body>");
+            out.println("<h1>Пользователя не сущетвует</h1>");
+            out.println("<p>Исполнитель с таким именем не зарегистрирован, укажите существоющего пользователя</p>");
+            out.println("</body>");
+            out.println("</html>");
+            return;
+        }
+
         Date deadline = Date.valueOf(request.getParameter("deadline"));
         String author = (String) request.getSession().getAttribute("username");
 
-        Task task = new Task(name,subtasks,assignee,deadline,author);
+        Task task = new Task(name, subtasks, assignee, deadline, author);
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -39,12 +52,12 @@ public class TaskTableServlet extends HttpServlet {
             // Connect to the database
             conn = DriverManager.getConnection(
                     "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                    "postgres"," ");
+                    "postgres", " ");
 
             // Create the SQL statement
             String sql = "INSERT INTO tasks (task_name, subtasks, assignee, deadline, author) VALUES (?,?,?,?,?)";
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1,  task.getTaskName());
+            stmt.setString(1, task.getTaskName());
             stmt.setString(2, task.getSubtaskName());
             stmt.setString(3, task.getAssignee());
             stmt.setDate(4, task.getDeadline());
@@ -64,7 +77,40 @@ public class TaskTableServlet extends HttpServlet {
         response.sendRedirect("main.jsp");
     }
 
-    static void closeConnection(PrintWriter out, Connection conn, PreparedStatement stmt) {
+    public boolean checkAssigneeUser(String assignee, PrintWriter out) {
+
+        boolean isValid = false;
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        String sql = "Select * FROM users WHERE username = ?";
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
+                    "postgres", " ");
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, assignee);
+            ResultSet rs = stmt.executeQuery();
+            isValid = rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the statement and connection
+            TaskTableServlet.closeConnection(out, conn, stmt);
+        }
+        return isValid;
+    }
+
+    public static void closeConnection(PrintWriter out, Connection conn, PreparedStatement stmt) {
         try {
             if (stmt != null) {
                 stmt.close();
@@ -87,10 +133,7 @@ public class TaskTableServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
         out.println("<!DOCTYPE html>");
-
-
         out.println("<html>");
-
         out.println("<head>");
 
         out.println("<style>");
@@ -108,15 +151,16 @@ public class TaskTableServlet extends HttpServlet {
         out.println("color: white;");
         out.println("}");
         out.println("</style>");
-        out.println("</head>");
 
+        out.println("</head>");
         out.println("<body>");
+
         out.println("<h2>Доска задач</h2>");
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
                 "postgres", " ")) {
 
-            String sql = "SELECT id, task_name, subtasks, assignee, deadline, author FROM tasks";
+            String sql = "SELECT id, task_name, subtasks, assignee, deadline, author FROM tasks where is_done = false order by deadline";
             Statement statement = conn.createStatement();
             ResultSet result = statement.executeQuery(sql);
 
@@ -146,7 +190,34 @@ public class TaskTableServlet extends HttpServlet {
                 out.println("<td>" + task.getId() + "</td>");
                 out.println("<td>" + task.getTaskName() + "</td>");
                 out.println("<td>" + task.getSubtaskName() + "</td>");
-                out.println("<td>" + task.getAssignee() + "</td>");
+
+                if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("true")) {
+                    out.println("<td>");
+                    out.println("<form action=\"update_table?update=takeUp&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+                    out.println("<input type=\"submit\" value=\"Стать исполнителем\">");
+                    out.println("</form>");
+                    out.println("</td>");
+
+                } else if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("false")) {
+                    out.println("<td> — </td>");
+
+                } else if(task.getAssignee().equals(request.getSession().getAttribute("username"))){
+                    out.println("<td>");
+
+                    out.println("<form action=\"update_table?update=rejection&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+                    out.println("<input type=\"submit\" value=\"Отказаться\">");
+                    out.println("</form>");
+
+                    out.println("<form action=\"update_table?update=done&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+                    out.println("<input type=\"submit\" value=\"Выполнено\">");
+                    out.println("</form>");
+
+                    out.println("</td>");
+                }
+                else {
+                    out.println("<td>" + task.getAssignee() + "</td>");
+                }
+
                 out.println("<td>" + task.getDeadline() + "</td>");
                 out.println("<td>" + task.getAuthor() + "</td>");
                 out.println("</tr>");
@@ -212,4 +283,5 @@ public class TaskTableServlet extends HttpServlet {
         }
 
     }
+
 }
