@@ -21,8 +21,9 @@
 
 
 <jsp:include page="tasktable"/>
+<br>
 <% if (!request.getSession().getAttribute("auth").equals("true")) {%>
-<p>Для принятия учистия в сервисе необходимо авторизоваться или зарегистрироваться.</p>
+<p>Для принятия участия в сервисе необходимо авторизоваться или зарегистрироваться.</p>
 <%}else {%>
 <jsp:include page="button.jsp"/>
 <%}%>

@@ -26,7 +26,7 @@
         <input type="text" id="assignee" name="assignee"><br>
 
         <label for="deadline">Deadline:</label>
-        <input type="date" id="deadline" name="deadline"><br>
+        <input type="date" id="deadline" name="deadline" required><br>
 
         <input type="submit" value="Отправить">
     </form>

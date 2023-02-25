@@ -1,5 +1,6 @@
 package com.example.bulletinboardandtasks;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -7,12 +8,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/tasktable")
 public class TaskTableServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -31,6 +33,7 @@ public class TaskTableServlet extends HttpServlet {
         String assignee = request.getParameter("assignee").trim();
 
         if (!checkAssigneeUser(assignee, out) && !assignee.equals("")) {
+            request.getRequestDispatcher("header.jsp").include(request, response);
             out.println("<html>");
             out.println("<head><title>Ошибка данных</title></head>");
             out.println("<body>");
@@ -217,8 +220,14 @@ public class TaskTableServlet extends HttpServlet {
                 else {
                     out.println("<td>" + task.getAssignee() + "</td>");
                 }
+                if(task.getDeadline().toLocalDate().isBefore(LocalDate.now())){
 
-                out.println("<td>" + task.getDeadline() + "</td>");
+                    out.println("<td><font color=\"red\">" + task.getDeadline() + "</font></td>");
+                }
+                else {
+                    out.println("<td>" + task.getDeadline() + "</td>");
+                }
+
                 out.println("<td>" + task.getAuthor() + "</td>");
                 out.println("</tr>");
             }
