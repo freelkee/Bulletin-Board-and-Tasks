@@ -19,7 +19,6 @@
 <p>Также вы можете найти или опубликовать задания на различные виды работ, включая уборку, покупкой товаров, переводы и
     многое другое.</p>
 
-
 <jsp:include page="tasktable"/>
 <br>
 <% if (!request.getSession().getAttribute("auth").equals("true")) {%>
@@ -27,29 +26,6 @@
 <%}else {%>
 <jsp:include page="button.jsp"/>
 <%}%>
-<%--
-<% if (!request.getSession().getAttribute("auth").equals("true")) {%>
-
-<p>Если у вас уже есть аккаунт, пожалуйста, войдите в систему:</p>
-<form action="login" method="get">
-    <input type="submit" value="Login">
-</form>
-
-
-<p>Если вы еще не зарегистрированы, пожалуйста, зарегистрируйтесь: </p>
-<form action="registration" method="get">
-    <input type="submit" value="Registration">
-</form>
-
-<%} else {%>
-<p>Вы уже авторизованы и можете пройти в личный кабинет:</p>
-<form action="personal_account" method="get">
-    <input type="submit" value="Home Page">
-</form>
-
-<%}%>
---%>
-
 
 </body>
 </html>

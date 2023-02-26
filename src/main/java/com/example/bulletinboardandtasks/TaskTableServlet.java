@@ -14,118 +14,6 @@ import java.util.List;
 
 @WebServlet("/tasktable")
 public class TaskTableServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        response.setContentType("text/html;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
-        String name = request.getParameter("name").trim();
-        String subtasks = request.getParameter("subtasks").trim();
-        String assignee = request.getParameter("assignee").trim();
-
-        if (!checkAssigneeUser(assignee, out) && !assignee.equals("")) {
-            request.getRequestDispatcher("header.jsp").include(request, response);
-            out.println("<html>");
-            out.println("<head><title>Ошибка данных</title></head>");
-            out.println("<body>");
-            out.println("<h1>Пользователя не сущетвует</h1>");
-            out.println("<p>Исполнитель с таким именем не зарегистрирован, укажите существоющего пользователя</p>");
-            out.println("</body>");
-            out.println("</html>");
-            return;
-        }
-
-        Date deadline = Date.valueOf(request.getParameter("deadline"));
-        String author = (String) request.getSession().getAttribute("username");
-
-        Task task = new Task(name, subtasks, assignee, deadline, author);
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        try {
-            // Connect to the database
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                    "postgres", " ");
-
-            // Create the SQL statement
-            String sql = "INSERT INTO tasks (task_name, subtasks, assignee, deadline, author) VALUES (?,?,?,?,?)";
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, task.getTaskName());
-            stmt.setString(2, task.getSubtaskName());
-            stmt.setString(3, task.getAssignee());
-            stmt.setDate(4, task.getDeadline());
-            stmt.setString(5, task.getAuthor());
-
-            // Execute the SQL statement
-            stmt.executeUpdate();
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-        } finally {
-            // Close the statement and connection
-            closeConnection(out, conn, stmt);
-        }
-        response.sendRedirect("main.jsp");
-    }
-
-    public boolean checkAssigneeUser(String assignee, PrintWriter out) {
-
-        boolean isValid = false;
-
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        String sql = "Select * FROM users WHERE username = ?";
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-
-        try {
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
-                    "postgres", " ");
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, assignee);
-            ResultSet rs = stmt.executeQuery();
-            isValid = rs.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Close the statement and connection
-            TaskTableServlet.closeConnection(out, conn, stmt);
-        }
-        return isValid;
-    }
-
-    public static void closeConnection(PrintWriter out, Connection conn, PreparedStatement stmt) {
-        try {
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            out.println("<h3>SQL Exception:</h3>");
-            out.println("<p>" + e.getMessage() + "</p>");
-        }
-    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -240,9 +128,121 @@ public class TaskTableServlet extends HttpServlet {
 
         out.println("</body></html>");
     }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+        String name = request.getParameter("name").trim();
+        String subtasks = request.getParameter("subtasks").trim();
+        String assignee = request.getParameter("assignee").trim();
+
+        if (!checkAssigneeUser(assignee) && !assignee.equals("")) {
+            request.getRequestDispatcher("header.jsp").include(request, response);
+            out.println("<html>");
+            out.println("<head><title>Ошибка данных</title></head>");
+            out.println("<body>");
+            out.println("<h1>Пользователя не сущетвует</h1>");
+            out.println("<p>Исполнитель с таким именем не зарегистрирован, укажите существоющего пользователя</p>");
+            out.println("</body>");
+            out.println("</html>");
+            return;
+        }
+
+        Date deadline = Date.valueOf(request.getParameter("deadline"));
+        String author = (String) request.getSession().getAttribute("username");
+
+        Task task = new Task(name, subtasks, assignee, deadline, author);
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            // Connect to the database
+            conn = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
+                    "postgres", " ");
+
+            // Create the SQL statement
+            String sql = "INSERT INTO tasks (task_name, subtasks, assignee, deadline, author) VALUES (?,?,?,?,?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, task.getTaskName());
+            stmt.setString(2, task.getSubtaskName());
+            stmt.setString(3, task.getAssignee());
+            stmt.setDate(4, task.getDeadline());
+            stmt.setString(5, task.getAuthor());
+
+            // Execute the SQL statement
+            stmt.executeUpdate();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            // Close the statement and connection
+            closeConnection(out, conn, stmt);
+        }
+        response.sendRedirect("main.jsp");
+    }
+
+    public boolean checkAssigneeUser(String assignee) {
+
+        boolean isValid = false;
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        String sql = "Select * FROM users WHERE username = ?";
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
+                    "postgres", " ");
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, assignee);
+            ResultSet rs = stmt.executeQuery();
+            isValid = rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the statement and connection
+            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+        }
+        return isValid;
+    }
+
+    public static void closeConnection(PrintWriter out, Connection conn, PreparedStatement stmt) {
+        try {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            out.println("<h3>SQL Exception:</h3>");
+            out.println("<p>" + e.getMessage() + "</p>");
+        }
+    }
 
     private static class Task {
-        private final int id;
+        private final Integer id;
         private final String taskName;
         private final String subtaskName;
         private final String assignee;
@@ -259,7 +259,7 @@ public class TaskTableServlet extends HttpServlet {
         }
 
         public Task(String taskName, String subtaskName, String assignee, Date deadline, String author) {
-            this.id = 0;
+            this.id = null;
             this.taskName = taskName;
             this.subtaskName = subtaskName;
             this.assignee = assignee;

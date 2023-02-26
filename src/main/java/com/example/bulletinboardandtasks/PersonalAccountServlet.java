@@ -55,7 +55,7 @@ public class PersonalAccountServlet extends HttpServlet {
                         "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
                         "postgres", " ");
                 stmt = conn.prepareStatement(sql);
-                stmt.setString(1, (String) request.getSession().getAttribute("username"));
+                stmt.setString(1, (String) session.getAttribute("username"));
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
                 out.println("<p>Количество выполненных заданий: " + rs.getInt("completed") + "</p>");
@@ -63,7 +63,7 @@ public class PersonalAccountServlet extends HttpServlet {
                 e.printStackTrace();
             } finally {
                 // Close the statement and connection
-                TaskTableServlet.closeConnection(out, conn, stmt);
+                TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
             }
 
         } else {

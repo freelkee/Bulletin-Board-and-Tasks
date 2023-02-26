@@ -3,7 +3,10 @@ package com.example.bulletinboardandtasks;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
@@ -42,14 +45,14 @@ public class LoginServlet extends HttpServlet {
         out.println("<html>");
 
 
-        if (isValidUser(username, password,response)) {
+        if (isValidUser(username, password)) {
             out.println("<head><title>Вход в систему выполнен успешно</title></head>");
             out.println("<body>");
 
             HttpSession session = request.getSession();
             session.setAttribute("auth", "true");
-            session.setMaxInactiveInterval(60*60);
-            session.setAttribute("username",username);
+            session.setMaxInactiveInterval(60 * 60);
+            session.setAttribute("username", username);
 
             request.getRequestDispatcher("header.jsp").include(request, response);
 
@@ -78,9 +81,7 @@ public class LoginServlet extends HttpServlet {
         out.println("</html>");
     }
 
-    public boolean isValidUser(String username, String password, HttpServletResponse response) throws IOException {
-
-        PrintWriter out = response.getWriter();
+    public boolean isValidUser(String username, String password) {
 
         boolean isValid = false;
 
@@ -109,7 +110,7 @@ public class LoginServlet extends HttpServlet {
             e.printStackTrace();
         } finally {
             // Close the statement and connection
-            TaskTableServlet.closeConnection(out, conn, stmt);
+            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
         }
         return isValid;
     }

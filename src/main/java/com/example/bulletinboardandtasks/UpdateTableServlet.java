@@ -23,7 +23,6 @@ public class UpdateTableServlet extends HttpServlet {
 
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -85,7 +84,7 @@ public class UpdateTableServlet extends HttpServlet {
 
         } finally {
             // Close the statement and connection
-            TaskTableServlet.closeConnection(out, conn, stmt);
+            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
         }
         response.sendRedirect("main.jsp");
     }
