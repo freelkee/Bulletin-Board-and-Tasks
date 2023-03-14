@@ -1,6 +1,6 @@
 package com.example.bulletinboardandtasks.servlets;
 
-import com.example.bulletinboardandtasks.model.Task;
+import com.example.bulletinboardandtasks.models.Task;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

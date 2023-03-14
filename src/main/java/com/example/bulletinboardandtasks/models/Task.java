@@ -1,4 +1,4 @@
-package com.example.bulletinboardandtasks.model;
+package com.example.bulletinboardandtasks.models;
 
 import java.sql.Date;
 
