@@ -1,4 +1,4 @@
-package com.example.bulletinboardandtasks;
+package com.example.bulletinboardandtasks.servlets;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -33,38 +33,10 @@ public class PersonalAccountServlet extends HttpServlet {
         dispatcher.include(request, response);
 
         HttpSession session = request.getSession();
+
         if (session.getAttribute("auth") != null && session.getAttribute("auth").equals("true")) {
 
-            out.println("<h1>Добро пожаловать в личный кабинет, "+ session.getAttribute("username") +"!</h1>");
-            out.println("<p>Вот некоторая совершенно секретная информация, которую можете видеть только вы...</p>");
-
-            try {
-                Class.forName("org.postgresql.Driver");
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
-
-            String sql = "SELECT completed FROM users WHERE username = ?";
-
-            Connection conn = null;
-            PreparedStatement stmt = null;
-
-            try {
-                conn = DriverManager.getConnection(
-                        "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                        "postgres", " ");
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, (String) session.getAttribute("username"));
-                ResultSet rs = stmt.executeQuery();
-                rs.next();
-                out.println("<p>Количество выполненных заданий: " + rs.getInt("completed") + "</p>");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                // Close the statement and connection
-                TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
-            }
+            authorizedUsersPage(out, session);
 
         } else {
             out.println("<h1>Вы не авторизованы. Повторите попытку после входа в систему.</h1>");
@@ -72,5 +44,38 @@ public class PersonalAccountServlet extends HttpServlet {
         }
         out.println("</body>");
         out.println("</html>");
+    }
+
+    private static void authorizedUsersPage(PrintWriter out, HttpSession session) {
+        out.println("<h1>Добро пожаловать в личный кабинет, " + session.getAttribute("username") + "!</h1>");
+        out.println("<p>Вот некоторая совершенно секретная информация, которую можете видеть только вы...</p>");
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        String sql = "SELECT completed FROM users WHERE username = ?";
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
+                    "postgres", " ");
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, (String) session.getAttribute("username"));
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            out.println("<p>Количество выполненных заданий: " + rs.getInt("completed") + "</p>");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the statement and connection
+            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+        }
     }
 }

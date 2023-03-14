@@ -1,4 +1,4 @@
-package com.example.bulletinboardandtasks;
+package com.example.bulletinboardandtasks.servlets;
 
 
 import javax.servlet.ServletException;

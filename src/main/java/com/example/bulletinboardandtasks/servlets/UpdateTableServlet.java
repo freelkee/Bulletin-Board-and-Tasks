@@ -1,4 +1,4 @@
-package com.example.bulletinboardandtasks;
+package com.example.bulletinboardandtasks.servlets;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,7 +14,7 @@ import java.sql.SQLException;
 @WebServlet(name = "com.example.bulletinboardandtasks.UpdateTableServlet", value = "/update_table")
 public class UpdateTableServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)  {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
     }
 
@@ -38,8 +38,6 @@ public class UpdateTableServlet extends HttpServlet {
                     "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
                     "postgres", " ");
             if (request.getParameter("update").equals("takeUp")) {
-
-
                 // Create the SQL statement
                 String sql = ("UPDATE tasks set assignee = ?  where id = ?");
                 stmt = conn.prepareStatement(sql);
@@ -50,7 +48,6 @@ public class UpdateTableServlet extends HttpServlet {
                 stmt.executeUpdate();
 
             } else if (request.getParameter("update").equals("rejection")) {
-
                 // Create the SQL statement
                 String sql = ("UPDATE tasks set assignee = ?  where id = ?");
                 stmt = conn.prepareStatement(sql);
@@ -62,7 +59,6 @@ public class UpdateTableServlet extends HttpServlet {
 
 
             } else if (request.getParameter("update").equals("done")) {
-
                 // Create the SQL statement
                 String sql = ("UPDATE tasks set is_done = ?  where id = ?");
                 stmt = conn.prepareStatement(sql);

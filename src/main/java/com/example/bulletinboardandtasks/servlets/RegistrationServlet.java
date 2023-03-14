@@ -1,4 +1,4 @@
-package com.example.bulletinboardandtasks;
+package com.example.bulletinboardandtasks.servlets;
 
 
 import javax.servlet.ServletException;
@@ -11,8 +11,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import static com.example.bulletinboardandtasks.TaskTableServlet.closeConnection;
 
 @WebServlet(name = "RegistrationPage", value = "/registration")
 public class RegistrationServlet extends HttpServlet {
@@ -108,7 +106,7 @@ public class RegistrationServlet extends HttpServlet {
             e.printStackTrace();
             return false;
         } finally {
-            closeConnection(new PrintWriter(System.out), conn, stmt);
+            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
         }
     }
 }

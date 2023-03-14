@@ -1,4 +1,6 @@
-package com.example.bulletinboardandtasks;
+package com.example.bulletinboardandtasks.servlets;
+
+import com.example.bulletinboardandtasks.model.Task;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +13,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @WebServlet("/tasktable")
 public class TaskTableServlet extends HttpServlet {
@@ -82,37 +85,11 @@ public class TaskTableServlet extends HttpServlet {
                 out.println("<td>" + task.getTaskName() + "</td>");
                 out.println("<td>" + task.getSubtaskName() + "</td>");
 
-                if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("true")) {
-                    out.println("<td>");
-                    out.println("<form action=\"update_table?update=takeUp&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
-                    out.println("<input type=\"submit\" value=\"Стать исполнителем\">");
-                    out.println("</form>");
-                    out.println("</td>");
+                assignee(request, out, task);
 
-                } else if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("false")) {
-                    out.println("<td> — </td>");
-
-                } else if(task.getAssignee().equals(request.getSession().getAttribute("username"))){
-                    out.println("<td>");
-
-                    out.println("<form action=\"update_table?update=rejection&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
-                    out.println("<input type=\"submit\" value=\"Отказаться\">");
-                    out.println("</form>");
-
-                    out.println("<form action=\"update_table?update=done&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
-                    out.println("<input type=\"submit\" value=\"Выполнено\">");
-                    out.println("</form>");
-
-                    out.println("</td>");
-                }
-                else {
-                    out.println("<td>" + task.getAssignee() + "</td>");
-                }
-                if(task.getDeadline().toLocalDate().isBefore(LocalDate.now())){
-
+                if (task.getDeadline().toLocalDate().isBefore(LocalDate.now())) {
                     out.println("<td><font color=\"red\">" + task.getDeadline() + "</font></td>");
-                }
-                else {
+                } else {
                     out.println("<td>" + task.getDeadline() + "</td>");
                 }
 
@@ -128,6 +105,35 @@ public class TaskTableServlet extends HttpServlet {
 
         out.println("</body></html>");
     }
+
+    private static void assignee(HttpServletRequest request, PrintWriter out, Task task) {
+        if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("true")) {
+            out.println("<td>");
+            out.println("<form action=\"update_table?update=takeUp&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+            out.println("<input type=\"submit\" value=\"Стать исполнителем\">");
+            out.println("</form>");
+            out.println("</td>");
+
+        } else if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("false")) {
+            out.println("<td> — </td>");
+
+        } else if (task.getAssignee().equals(request.getSession().getAttribute("username"))) {
+            out.println("<td>");
+
+            out.println("<form action=\"update_table?update=rejection&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+            out.println("<input type=\"submit\" value=\"Отказаться\">");
+            out.println("</form>");
+
+            out.println("<form action=\"update_table?update=done&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+            out.println("<input type=\"submit\" value=\"Выполнено\">");
+            out.println("</form>");
+
+            out.println("</td>");
+        } else {
+            out.println("<td>" + task.getAssignee() + "</td>");
+        }
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         response.setContentType("text/html;charset=UTF-8");
@@ -139,7 +145,6 @@ public class TaskTableServlet extends HttpServlet {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-
 
 
         String name = request.getParameter("name").trim();
@@ -240,57 +245,4 @@ public class TaskTableServlet extends HttpServlet {
             out.println("<p>" + e.getMessage() + "</p>");
         }
     }
-
-    private static class Task {
-        private final Integer id;
-        private final String taskName;
-        private final String subtaskName;
-        private final String assignee;
-        private final Date deadline;
-        private final String author;
-
-        public Task(int id, String taskName, String subtaskName, String assignee, Date deadline, String author) {
-            this.id = id;
-            this.taskName = taskName;
-            this.subtaskName = subtaskName;
-            this.assignee = assignee;
-            this.deadline = deadline;
-            this.author = author;
-        }
-
-        public Task(String taskName, String subtaskName, String assignee, Date deadline, String author) {
-            this.id = null;
-            this.taskName = taskName;
-            this.subtaskName = subtaskName;
-            this.assignee = assignee;
-            this.deadline = deadline;
-            this.author = author;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getTaskName() {
-            return taskName;
-        }
-
-        public String getSubtaskName() {
-            return subtaskName;
-        }
-
-        public String getAssignee() {
-            return assignee;
-        }
-
-        public Date getDeadline() {
-            return deadline;
-        }
-
-        public String getAuthor() {
-            return author;
-        }
-
-    }
-
 }

@@ -11,7 +11,7 @@
     HttpSession firstSession = request.getSession();
     if (firstSession.getAttribute("auth") == null) {
         firstSession.setAttribute("auth", "false");
-        firstSession.setAttribute("username","unknown");
+        firstSession.setAttribute("username", "unknown");
     }%>
 <h1>Добро пожаловать на доску объявлений и заданий 352-ой квартиры!</h1>
 <p>Здесь вы можете найти или опубликовать объявления о событиях, прямо или косвенно связанных с квартирой 352 на Есенина
@@ -23,7 +23,7 @@
 <br>
 <% if (!request.getSession().getAttribute("auth").equals("true")) {%>
 <p>Для принятия участия в сервисе необходимо авторизоваться или зарегистрироваться.</p>
-<%}else {%>
+<%} else {%>
 <jsp:include page="button.jsp"/>
 <%}%>
 
