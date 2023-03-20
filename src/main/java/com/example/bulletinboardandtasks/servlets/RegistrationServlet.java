@@ -106,7 +106,7 @@ public class RegistrationServlet extends HttpServlet {
             e.printStackTrace();
             return false;
         } finally {
-            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+            TaskTableServlet.closeConnection(conn, stmt);
         }
     }
 }

@@ -80,7 +80,7 @@ public class UpdateTableServlet extends HttpServlet {
 
         } finally {
             // Close the statement and connection
-            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+            TaskTableServlet.closeConnection(conn, stmt);
         }
         response.sendRedirect("main.jsp");
     }

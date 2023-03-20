@@ -75,7 +75,7 @@ public class PersonalAccountServlet extends HttpServlet {
             e.printStackTrace();
         } finally {
             // Close the statement and connection
-            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+            TaskTableServlet.closeConnection(conn, stmt);
         }
     }
 }
