@@ -1,6 +1,6 @@
 package com.example.bulletinboardandtasks.servlets;
 
-import com.example.bulletinboardandtasks.model.Task;
+import com.example.bulletinboardandtasks.models.Task;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,43 +18,27 @@ import java.util.List;
 @WebServlet("/tasktable")
 public class TaskTableServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws IOException {
+
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
 
-        out.println("<style>");
-        out.println("table {");
-        out.println("border-collapse: collapse;");
-        out.println("width: 100%;");
-        out.println("}");
-        out.println("th, td {");
-        out.println("text-align: left;");
-        out.println("padding: 8px;");
-        out.println("}");
-        out.println("tr:nth-child(even){background-color: #f2f2f2}");
-        out.println("th {");
-        out.println("background-color: #4CAF50;");
-        out.println("color: white;");
-        out.println("}");
-        out.println("</style>");
+        PrintWriter out = response.getWriter();
+        response.setContentType("text/html;charset=UTF-8");
 
-        out.println("</head>");
-        out.println("<body>");
-
+        htmlHeader(out);
         out.println("<h2>Доска задач</h2>");
+
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
                 "postgres", " ")) {
 
-            String sql = "SELECT id, task_name, subtasks, assignee, deadline, author FROM tasks where is_done = false order by deadline";
+            String sql = "SELECT id, task_name, subtasks, assignee, deadline, author " +
+                    "FROM tasks where is_done = false order by deadline";
             Statement statement = conn.createStatement();
             ResultSet result = statement.executeQuery(sql);
 
@@ -88,7 +72,8 @@ public class TaskTableServlet extends HttpServlet {
                 assignee(request, out, task);
 
                 if (task.getDeadline().toLocalDate().isBefore(LocalDate.now())) {
-                    out.println("<td><font color=\"red\">" + task.getDeadline() + "</font></td>");
+                    out.println("<td><font color=\"red\">" +
+                            task.getDeadline() + "</font></td>");
                 } else {
                     out.println("<td>" + task.getDeadline() + "</td>");
                 }
@@ -106,25 +91,55 @@ public class TaskTableServlet extends HttpServlet {
         out.println("</body></html>");
     }
 
+    public static void htmlHeader(PrintWriter out) {
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+
+        out.println("<style>");
+        out.println("table {");
+        out.println("border-collapse: collapse;");
+        out.println("width: 100%;");
+        out.println("}");
+        out.println("th, td {");
+        out.println("text-align: left;");
+        out.println("padding: 8px;");
+        out.println("}");
+        out.println("tr:nth-child(even){background-color: #f2f2f2}");
+        out.println("th {");
+        out.println("background-color: #4CAF50;");
+        out.println("color: white;");
+        out.println("}");
+        out.println("</style>");
+
+        out.println("</head>");
+        out.println("<body>");
+    }
+
     private static void assignee(HttpServletRequest request, PrintWriter out, Task task) {
-        if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("true")) {
+        if (task.getAssignee().equals("") &&
+                request.getSession().getAttribute("auth").equals("true")) {
             out.println("<td>");
-            out.println("<form action=\"update_table?update=takeUp&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+            out.println("<form action=\"update_table?update=takeUp&taskId=" +
+                    task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Стать исполнителем\">");
             out.println("</form>");
             out.println("</td>");
 
-        } else if (task.getAssignee().equals("") && request.getSession().getAttribute("auth").equals("false")) {
+        } else if (task.getAssignee().equals("") &&
+                request.getSession().getAttribute("auth").equals("false")) {
             out.println("<td> — </td>");
 
         } else if (task.getAssignee().equals(request.getSession().getAttribute("username"))) {
             out.println("<td>");
 
-            out.println("<form action=\"update_table?update=rejection&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+            out.println("<form action=\"update_table?update=rejection&taskId=" +
+                    task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Отказаться\">");
             out.println("</form>");
 
-            out.println("<form action=\"update_table?update=done&taskId=" + task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+            out.println("<form action=\"update_table?update=done&taskId=" +
+                    task.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Выполнено\">");
             out.println("</form>");
 
@@ -134,7 +149,8 @@ public class TaskTableServlet extends HttpServlet {
         }
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
 
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -157,7 +173,8 @@ public class TaskTableServlet extends HttpServlet {
             out.println("<head><title>Ошибка данных</title></head>");
             out.println("<body>");
             out.println("<h1>Пользователя не сущетвует</h1>");
-            out.println("<p>Исполнитель с таким именем не зарегистрирован, укажите существоющего пользователя</p>");
+            out.println("<p>Исполнитель с таким именем не зарегистрирован, " +
+                    "укажите существоющего пользователя</p>");
             out.println("</body>");
             out.println("</html>");
             return;
@@ -177,7 +194,8 @@ public class TaskTableServlet extends HttpServlet {
                     "postgres", " ");
 
             // Create the SQL statement
-            String sql = "INSERT INTO tasks (task_name, subtasks, assignee, deadline, author) VALUES (?,?,?,?,?)";
+            String sql = "INSERT INTO tasks (task_name, subtasks, assignee, deadline, author) " +
+                    "VALUES (?,?,?,?,?)";
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, task.getTaskName());
             stmt.setString(2, task.getSubtaskName());
@@ -190,11 +208,11 @@ public class TaskTableServlet extends HttpServlet {
 
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
 
         } finally {
             // Close the statement and connection
-            closeConnection(out, conn, stmt);
+            closeConnection(conn, stmt);
         }
         response.sendRedirect("main.jsp");
     }
@@ -224,15 +242,15 @@ public class TaskTableServlet extends HttpServlet {
             ResultSet rs = stmt.executeQuery();
             isValid = rs.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } finally {
             // Close the statement and connection
-            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+            TaskTableServlet.closeConnection(conn, stmt);
         }
         return isValid;
     }
 
-    public static void closeConnection(PrintWriter out, Connection conn, PreparedStatement stmt) {
+    public static void closeConnection(Connection conn, PreparedStatement stmt) {
         try {
             if (stmt != null) {
                 stmt.close();
@@ -241,8 +259,7 @@ public class TaskTableServlet extends HttpServlet {
                 conn.close();
             }
         } catch (SQLException e) {
-            out.println("<h3>SQL Exception:</h3>");
-            out.println("<p>" + e.getMessage() + "</p>");
+            System.out.println(e.getMessage());
         }
     }
 }

@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,7 +19,8 @@ public class UpdateTableServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -73,6 +74,15 @@ public class UpdateTableServlet extends HttpServlet {
                 stmt.setString(1, (String) request.getSession().getAttribute("username"));
                 // Execute the SQL statement
                 stmt.executeUpdate();
+            }else if (request.getParameter("update").equals("deleteAnnouncement")) {
+                // Create the SQL statement
+                String sql = ("DELETE from announcements where id = ?");
+                stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, Integer.parseInt(request.getParameter("taskId")));
+
+                // Execute the SQL statement
+                stmt.executeUpdate();
+
             }
         } catch (
                 SQLException e) {
@@ -80,7 +90,7 @@ public class UpdateTableServlet extends HttpServlet {
 
         } finally {
             // Close the statement and connection
-            TaskTableServlet.closeConnection(new PrintWriter(System.out), conn, stmt);
+            TaskTableServlet.closeConnection(conn, stmt);
         }
         response.sendRedirect("main.jsp");
     }
