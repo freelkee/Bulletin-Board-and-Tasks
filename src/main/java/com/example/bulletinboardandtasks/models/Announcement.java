@@ -1,7 +1,7 @@
 package com.example.bulletinboardandtasks.models;
 
 public class Announcement {
-    private final int id;
+    private int id;
     private final String title;
     private final String author;
     private final String description;
@@ -9,6 +9,11 @@ public class Announcement {
 
     public Announcement(int id, String title, String author, String description) {
         this.id = id;
+        this.title = title;
+        this.author = author;
+        this.description = description;
+    }
+    public Announcement( String title, String author, String description) {
         this.title = title;
         this.author = author;
         this.description = description;

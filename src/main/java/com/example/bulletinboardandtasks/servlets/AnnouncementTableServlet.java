@@ -13,41 +13,23 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.bulletinboardandtasks.servlets.TaskTableServlet.closeConnection;
+
 @WebServlet("/announcementtable")
 public class AnnouncementTableServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType("text/html;charset=UTF-8");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
         PrintWriter out = response.getWriter();
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
+        response.setContentType("text/html;charset=UTF-8");
 
-        out.println("<style>");
-        out.println("table {");
-        out.println("border-collapse: collapse;");
-        out.println("width: 100%;");
-        out.println("}");
-        out.println("th, td {");
-        out.println("text-align: left;");
-        out.println("padding: 8px;");
-        out.println("}");
-        out.println("tr:nth-child(even){background-color: #f2f2f2}");
-        out.println("th {");
-        out.println("background-color: #4CAF50;");
-        out.println("color: white;");
-        out.println("}");
-        out.println("</style>");
-
-        out.println("</head>");
-        out.println("<body>");
-
-        out.println("<h2>Объявления</h2>");
+        TaskTableServlet.htmlHeader(out);
+        out.println("<h2>Доска объявлений</h2>");
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -58,8 +40,9 @@ public class AnnouncementTableServlet extends HttpServlet {
                     "postgres", " ");
 
             String sql = "SELECT id, title, author, description FROM announcements ORDER BY id DESC";
-            stmt = conn.prepareStatement(sql);
-            ResultSet result = stmt.executeQuery(sql);
+
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery(sql);
 
             List<Announcement> announcements = new ArrayList<>();
             while (result.next()) {
@@ -82,57 +65,68 @@ public class AnnouncementTableServlet extends HttpServlet {
                 out.println("<tr>");
                 out.println("<td>" + announcement.getId() + "</td>");
                 out.println("<td>" + announcement.getTitle() + "</td>");
-                out.println("<td>" + announcement.getAuthor() + "</td>");
+                if (announcement.getAuthor().equals(request.getSession().getAttribute("username"))) {
+                    out.println("<td>");
+
+                    out.println("<form action=\"update_table?update=deleteAnnouncement&taskId=" +
+                            announcement.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
+                    out.println("<input type=\"submit\" value=\"Удалить\">");
+                    out.println("</form>");
+
+                    out.println("</td>");
+                } else
+                    out.println("<td>" + announcement.getAuthor() + "</td>");
+
                 out.println("<td>" + announcement.getDescription() + "</td>");
                 out.println("</tr>");
             }
             out.println("</table>");
-
-            if (request.getSession().getAttribute("auth").equals("true")) {
-                out.println("<h2>Создать новое объявление</h2>");
-                out.println("<form action=\"announcementtable\" method=\"post\">");
-                out.println("<label for=\"title\">Заголовок:</label><br>");
-                out.println("<input type=\"text\" id=\"title\" name=\"title\"><br>");
-                out.println("<label for=\"author\">Автор:</label><br>");
-                out.println("<input type=\"text\" id=\"author\" name=\"author\"><br>");
-                out.println("<label for=\"description\">Описание:</label><br>");
-                out.println("<textarea id=\"description\" name=\"description\" rows=\"4\" cols=\"50\"></textarea><br><br>");
-                out.println("<input type=\"submit\" value=\"Создать\">");
-                out.println("</form>");
-            }
-
-            out.println("</body>");
-            out.println("</html>");
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            closeConnection(conn, stmt);
         }
-        finally {
-            // Close the statement and connection
-            TaskTableServlet.closeConnection(conn, stmt);
+        out.println("<br>");
+        if (request.getSession().getAttribute("auth").equals("true")) {
+            request.getRequestDispatcher("announcementButton.jsp").include(request, response);
         }
+        out.println("</body>");
+        out.println("</html>");
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
-            ServletException, IOException {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+
         String title = request.getParameter("title");
-        String author = request.getParameter("author");
+        String author = (String) request.getSession().getAttribute("username");
         String description = request.getParameter("description");
 
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
-                "postgres", " ")) {
+        Announcement announcement = new Announcement(title, author, description);
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            // Connect to the database
+            conn = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
+                    "postgres", " ");
 
             String sql = "INSERT INTO announcements (title, author, description) VALUES (?, ?, ?)";
-            PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, title);
-            statement.setString(2, author);
-            statement.setString(3, description);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        }
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, announcement.getTitle());
+            stmt.setString(2, announcement.getAuthor());
+            stmt.setString(3, announcement.getDescription());
+            stmt.executeUpdate();
 
-        response.sendRedirect(request.getContextPath() + "/announcementtable");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            // Close the statement and connection
+            closeConnection(conn, stmt);
+        }
+        response.sendRedirect("main.jsp");
     }
 }
 

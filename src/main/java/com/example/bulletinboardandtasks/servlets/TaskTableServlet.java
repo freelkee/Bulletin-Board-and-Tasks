@@ -20,37 +20,19 @@ public class TaskTableServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
 
-        out.println("<style>");
-        out.println("table {");
-        out.println("border-collapse: collapse;");
-        out.println("width: 100%;");
-        out.println("}");
-        out.println("th, td {");
-        out.println("text-align: left;");
-        out.println("padding: 8px;");
-        out.println("}");
-        out.println("tr:nth-child(even){background-color: #f2f2f2}");
-        out.println("th {");
-        out.println("background-color: #4CAF50;");
-        out.println("color: white;");
-        out.println("}");
-        out.println("</style>");
+        PrintWriter out = response.getWriter();
+        response.setContentType("text/html;charset=UTF-8");
 
-        out.println("</head>");
-        out.println("<body>");
-
+        htmlHeader(out);
         out.println("<h2>Доска задач</h2>");
+
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
                 "postgres", " ")) {
@@ -107,6 +89,31 @@ public class TaskTableServlet extends HttpServlet {
         }
 
         out.println("</body></html>");
+    }
+
+    public static void htmlHeader(PrintWriter out) {
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+
+        out.println("<style>");
+        out.println("table {");
+        out.println("border-collapse: collapse;");
+        out.println("width: 100%;");
+        out.println("}");
+        out.println("th, td {");
+        out.println("text-align: left;");
+        out.println("padding: 8px;");
+        out.println("}");
+        out.println("tr:nth-child(even){background-color: #f2f2f2}");
+        out.println("th {");
+        out.println("background-color: #4CAF50;");
+        out.println("color: white;");
+        out.println("}");
+        out.println("</style>");
+
+        out.println("</head>");
+        out.println("<body>");
     }
 
     private static void assignee(HttpServletRequest request, PrintWriter out, Task task) {
@@ -201,7 +208,7 @@ public class TaskTableServlet extends HttpServlet {
 
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
 
         } finally {
             // Close the statement and connection
@@ -235,7 +242,7 @@ public class TaskTableServlet extends HttpServlet {
             ResultSet rs = stmt.executeQuery();
             isValid = rs.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } finally {
             // Close the statement and connection
             TaskTableServlet.closeConnection(conn, stmt);

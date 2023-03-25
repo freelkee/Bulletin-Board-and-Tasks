@@ -3,7 +3,7 @@ package com.example.bulletinboardandtasks.models;
 import java.sql.Date;
 
 public class Task {
-    private final Integer id;
+    private Integer id;
     private final String taskName;
     private final String subtaskName;
     private final String assignee;
@@ -20,7 +20,7 @@ public class Task {
     }
 
     public Task(String taskName, String subtaskName, String assignee, Date deadline, String author) {
-        this.id = null;
+
         this.taskName = taskName;
         this.subtaskName = subtaskName;
         this.assignee = assignee;

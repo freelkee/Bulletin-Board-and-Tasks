@@ -14,7 +14,8 @@ import java.sql.SQLException;
 
 @WebServlet(name = "RegistrationPage", value = "/registration")
 public class RegistrationServlet extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
 
@@ -35,7 +36,8 @@ public class RegistrationServlet extends HttpServlet {
         out.println("</html>");
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
 
@@ -67,7 +69,8 @@ public class RegistrationServlet extends HttpServlet {
             out.println("<h1>Ошибка регистрации</h1>");
             out.println("<p>Попробуйте использовать другое имя пользователя.</p>");
 
-            out.println("<form action=\"registration\" method=\"get\" accept-charset=\"UTF-8\">");
+            out.println("<form action=\"registration\" method=\"get\" " +
+                    "accept-charset=\"UTF-8\">");
             out.println("<input type=\"submit\" value=\"Повторить\">");
             out.println("</form>");
         }
@@ -103,7 +106,7 @@ public class RegistrationServlet extends HttpServlet {
             return true;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         } finally {
             TaskTableServlet.closeConnection(conn, stmt);
