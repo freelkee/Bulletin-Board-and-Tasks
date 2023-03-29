@@ -9,26 +9,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Кнопка с формой</title>
+    <title>Button</title>
     <meta charset="UTF-8">
 </head>
 <body>
-<button onclick="showForm()">Добавить задание</button>
+<button onclick="showForm()">Add an Assignment</button>
 <div id="form" style="display: none;">
     <form action="tasktable" method="post" accept-charset="UTF-8">
-        <label for="name">Наименование:</label>
+        <label for="name">Name:</label>
         <input type="text" id="name" name="name" required><br>
 
-        <label for="subtasks">Подзадачи:</label>
+        <label for="subtasks">Subtasks:</label>
         <textarea id="subtasks" name="subtasks"></textarea><br>
 
-        <label for="assignee">Исполнитель:</label>
+        <label for="assignee">Assignee:</label>
         <input type="text" id="assignee" name="assignee"><br>
 
         <label for="deadline">Deadline:</label>
         <input type="date" id="deadline" name="deadline" required><br>
 
-        <input type="submit" value="Отправить">
+        <input type="submit" value="Create">
     </form>
 </div>
 <script>

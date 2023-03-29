@@ -1,17 +1,18 @@
 package com.example.bulletinboardandtasks.servlets;
 
 import com.example.bulletinboardandtasks.models.Announcement;
+import com.example.bulletinboardandtasks.models.Props;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static com.example.bulletinboardandtasks.servlets.TaskTableServlet.closeConnection;
 
@@ -29,15 +30,14 @@ public class AnnouncementTableServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         TaskTableServlet.htmlHeader(out);
-        out.println("<h2>Доска объявлений</h2>");
+        out.println("<h2>Bulletin Board</h2>");
 
         Connection conn = null;
         PreparedStatement stmt = null;
 
         try {
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                    "postgres", " ");
+            Props props = new Props();
+            conn = DriverManager.getConnection(props.getUrl(), props.getUser(), props.getPassword());
 
             String sql = "SELECT id, title, author, description FROM announcements ORDER BY id DESC";
 
@@ -56,9 +56,9 @@ public class AnnouncementTableServlet extends HttpServlet {
             out.println("<table>");
             out.println("<tr>" +
                     "<th>ID</th>" +
-                    "<th>Заголовок</th>" +
-                    "<th>Автор</th>" +
-                    "<th>Описание</th>" +
+                    "<th>Title</th>" +
+                    "<th>Author</th>" +
+                    "<th>Description</th>" +
                     "</tr>");
 
             for (Announcement announcement : announcements) {
@@ -70,7 +70,7 @@ public class AnnouncementTableServlet extends HttpServlet {
 
                     out.println("<form action=\"update_table?update=deleteAnnouncement&taskId=" +
                             announcement.getId() + "\" method=\"post\" accept-charset=\"UTF-8\">");
-                    out.println("<input type=\"submit\" value=\"Удалить\">");
+                    out.println("<input type=\"submit\" value=\"Delette\">");
                     out.println("</form>");
 
                     out.println("</td>");
@@ -82,7 +82,7 @@ public class AnnouncementTableServlet extends HttpServlet {
             }
             out.println("</table>");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         } finally {
             closeConnection(conn, stmt);
         }

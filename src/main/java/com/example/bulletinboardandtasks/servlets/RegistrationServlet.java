@@ -1,6 +1,8 @@
 package com.example.bulletinboardandtasks.servlets;
 
 
+import com.example.bulletinboardandtasks.models.Props;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
@@ -21,16 +23,16 @@ public class RegistrationServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         out.println("<html>");
-        out.println("<head><title>Регистрация пользователя</title></head>");
+        out.println("<head><title>User registration</title></head>");
         out.println("<body>");
 
         request.getRequestDispatcher("header.jsp").include(request, response);
 
-        out.println("<h1>Регистрация пользователя</h1>");
+        out.println("<h1>User registration</h1>");
         out.println("<form action=\"registration\" method=\"post\" accept-charset=\"UTF-8\">");
-        out.println("Имя пользователя: <input type=\"text\" name=\"username\" required><br>");
-        out.println("Пароль: <input type=\"password\" name=\"password\" required><br>");
-        out.println("<input type=\"submit\" value=\"Зарегистрироваться \">");
+        out.println("Username: <input type=\"text\" name=\"username\" required><br>");
+        out.println("Password: <input type=\"password\" name=\"password\" required><br>");
+        out.println("<input type=\"submit\" value=\"Sign up\">");
         out.println("</form>");
         out.println("</body>");
         out.println("</html>");
@@ -48,30 +50,30 @@ public class RegistrationServlet extends HttpServlet {
         out.println("<html>");
 
         if(saveUser(username,password)) {
-            out.println("<head><title>Регистрация прошла успешно</title></head>");
+            out.println("<head><title>Registration was successful</title></head>");
             out.println("<body>");
 
             request.getRequestDispatcher("header.jsp").include(request, response);
 
-            out.println("<h1>Регистрация прошла успешно</h1>");
-            out.println("<p>Спасибо за регистрацию, " + username + ".</p>");
+            out.println("<h1>Registration was successful</h1>");
+            out.println("<p>Thank you for registering, " + username + ".</p>");
 
             out.println("<form action=\"login\" method=\"get\" accept-charset=\"UTF-8\">");
-            out.println("<input type=\"submit\" value=\"Войти\">");
+            out.println("<input type=\"submit\" value=\"Sign in\">");
             out.println("</form>");
         }
         else{
-            out.println("<head><title>Ошибка регистрации</title></head>");
+            out.println("<head><title>Registration error</title></head>");
             out.println("<body>");
 
             request.getRequestDispatcher("header.jsp").include(request, response);
 
-            out.println("<h1>Ошибка регистрации</h1>");
-            out.println("<p>Попробуйте использовать другое имя пользователя.</p>");
+            out.println("<h1>Registration error</h1>");
+            out.println("<p>Try using a different username.</p>");
 
             out.println("<form action=\"registration\" method=\"get\" " +
                     "accept-charset=\"UTF-8\">");
-            out.println("<input type=\"submit\" value=\"Повторить\">");
+            out.println("<input type=\"submit\" value=\"Try again\">");
             out.println("</form>");
         }
         out.println("</body>");
@@ -91,9 +93,8 @@ public class RegistrationServlet extends HttpServlet {
         PreparedStatement stmt = null;
         try {
             // Connect to the database
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                    "postgres"," ");
+            Props props = new Props();
+            conn = DriverManager.getConnection(props.getUrl(), props.getUser(), props.getPassword());
 
             // Create the SQL statement
             String sql = "INSERT INTO users (username, password) VALUES (?, ?)";

@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>Header</title>
     <style>
-        /* Стили для горизонтального меню */
+        /* horizontal menu */
         ul {
             list-style-type: none;
             margin: 0;
@@ -36,7 +36,7 @@
             background-color: #4CAF50;
         }
 
-        /* Стили для кнопок в верхнем левом углу */
+        /* button in left up circle  */
         .topnav {
             position: absolute;
             top: 8px;
@@ -66,18 +66,18 @@
     <%
         if (request.getSession().getAttribute("auth") != null && request.getSession().getAttribute("auth").equals("true")){
     %>
-    <a href="personal_account">Личный кабинет</a>
-    <a href="logout">Выйти</a>
+    <a href="personal_account">My Account</a>
+    <a href="logout">Log out</a>
     <%} else {%>
-    <a href="login">Войти</a>
-    <a href="registration">Зарегестрироваться</a>
+    <a href="login">Sign in</a>
+    <a href="registration">Sign up</a>
     <%}%>
 </div>
 
 <ul>
-    <li><a class="active" href="main.jsp">Главная</a></li>
-    <li><a href="info.jsp">О нас</a></li>
-    <li><a href="contacts.jsp">Контакты</a></li>
+    <li><a class="active" href="main.jsp">Home page</a></li>
+    <li><a href="info.jsp">About Us</a></li>
+    <li><a href="contacts.jsp">Contact</a></li>
 </ul>
 
 </body>

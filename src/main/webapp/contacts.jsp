@@ -15,11 +15,11 @@
 </head>
 <body>
 <jsp:include page="header.jsp"/>
-<h1>Контакты</h1>
-<p>Если у вас есть какие-либо вопросы или предложения, пожалуйста, свяжитесь с нами:</p>
+<h1>Contact</h1>
+<p>If you have any questions or suggestions, please contact us:</p>
 
-    Телеграмм: <a href="https://t.me/freelkee">@freelkee</a> <br>
-    Почта: <a href="mailto:freelkee@ya.ru">freelkee@ya.ru</a> <br>
+    Telegram: <a href="https://t.me/freelkee">@freelkee</a> <br>
+    Email: <a href="mailto:freelkee@ya.ru">freelkee@ya.ru</a> <br>
     GitHub: <a href="https://github.com/freelkee">freelkee</a> <br>
 
 </body>

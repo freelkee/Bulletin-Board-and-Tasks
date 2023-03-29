@@ -1,5 +1,7 @@
 package com.example.bulletinboardandtasks.servlets;
 
+import com.example.bulletinboardandtasks.models.Props;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,7 +27,7 @@ public class PersonalAccountServlet extends HttpServlet {
         out.println("<html>");
         out.println("<head>");
         out.println("<meta charset=\"UTF-8\">");
-        out.println("<title>Личный кабинет</title>");
+        out.println("<title>My Account</title>");
         out.println("</head>");
         out.println("<body>");
 
@@ -39,16 +41,16 @@ public class PersonalAccountServlet extends HttpServlet {
             authorizedUsersPage(out, session);
 
         } else {
-            out.println("<h1>Вы не авторизованы. Повторите попытку после входа в систему.</h1>");
-            out.println("<a href=\"main.jsp\">Вернуться на главную страницу</a>");
+            out.println("<h1>You are not logged in. Try again after logging in.</h1>");
+            out.println("<a href=\"main.jsp\">Back to the home page</a>");
         }
         out.println("</body>");
         out.println("</html>");
     }
 
     private static void authorizedUsersPage(PrintWriter out, HttpSession session) {
-        out.println("<h1>Добро пожаловать в личный кабинет, " + session.getAttribute("username") + "!</h1>");
-        out.println("<p>Вот некоторая совершенно секретная информация, которую можете видеть только вы...</p>");
+        out.println("<h1>Welcome to your personal account " + session.getAttribute("username") + "!</h1>");
+        out.println("<p>Here is some top secret information that only you can see...</p>");
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -63,18 +65,17 @@ public class PersonalAccountServlet extends HttpServlet {
         PreparedStatement stmt = null;
 
         try {
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                    "postgres", " ");
+            Props props = new Props();
+            conn = DriverManager.getConnection(props.getUrl(), props.getUser(), props.getPassword());
+
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, (String) session.getAttribute("username"));
             ResultSet rs = stmt.executeQuery();
             rs.next();
-            out.println("<p>Количество выполненных заданий: " + rs.getInt("completed") + "</p>");
+            out.println("<p>Number of tasks completed: " + rs.getInt("completed") + "</p>");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            // Close the statement and connection
             TaskTableServlet.closeConnection(conn, stmt);
         }
     }
