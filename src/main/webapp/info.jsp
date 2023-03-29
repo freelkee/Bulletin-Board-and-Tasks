@@ -11,13 +11,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>О нас</title>
+    <title>About us</title>
 </head>
 <body>
 <jsp:include page="header.jsp"/>
-<h1>Добро пожаловать на нашу доску объявлений и заданий!</h1>
-<p>Это пробное приложение на Java EE, где вы можете добавлять свои объявления и задания для решения любых задач.
-    Наша доска объявлений и заданий предоставляет множество возможностей для поиска и размещения информации.</p>
-<p>Исходный код проекта доступен на <a href="https://github.com/freelkee/Bulletin-Board-and-Tasks">GitHub</a>.</p>
+<h1>Welcome to our bulletin board and task!</h1>
+<p>This is a Java EE trial application where you can add your own classifieds and jobs for any task.
+    Our bulletin board and tasks board provide many opportunities to find and post information.</p>
+<p>Source code for the project is available at  <a href="https://github.com/freelkee/Bulletin-Board-and-Tasks">GitHub</a>.</p>
 </body>
 </html>

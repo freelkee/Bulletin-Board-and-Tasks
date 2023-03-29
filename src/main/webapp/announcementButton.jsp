@@ -9,18 +9,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Кнопка с формой</title>
+    <title>Button</title>
     <meta charset="UTF-8">
 </head>
 <body>
-<button onclick="showForm()">Создать новое объявление</button>
+<button onclick="showForm()">Create a new ad</button>
 <div id="form" style="display: none;">
     <form action="announcementtable" method="post">
-    <%--@declare id="title"--%><label for="title">Заголовок:</label><br>
+    <%--@declare id="title"--%><label for="title">Title:</label><br>
     <input type="text" id=\"title" name="title"><br>
-    <label for="description">Описание:</label><br>
+    <label for="description">Description:</label><br>
     <textarea id="description" name="description" rows=\"4\" cols=\"50\"></textarea><br><br>
-    <input type="submit" value="Создать">
+    <input type="submit" value="Create">
     </form>
 </div>
 <script>
