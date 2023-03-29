@@ -1,6 +1,8 @@
 package com.example.bulletinboardandtasks.servlets;
 
 
+import com.example.bulletinboardandtasks.models.Props;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,16 +22,16 @@ public class LoginServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         out.println("<html>");
-        out.println("<head><title>Авторизация</title></head>");
+        out.println("<head><title>Log in</title></head>");
         out.println("<body>");
 
         request.getRequestDispatcher("header.jsp").include(request, response);
 
         out.println("<h1>User Login</h1>");
         out.println("<form action=\"login\" method=\"post\" accept-charset=\"UTF-8\"> ");
-        out.println("Имя пользователя: <input type=\"text\" name=\"username\"><br>");
-        out.println("Пароль: <input type=\"password\" name=\"password\"><br>");
-        out.println("<input type=\"submit\" value=\"Войти\">");
+        out.println("Username: <input type=\"text\" name=\"username\"><br>");
+        out.println("Password: <input type=\"password\" name=\"password\"><br>");
+        out.println("<input type=\"submit\" value=\"Log in\">");
         out.println("</form>");
         out.println("</body>");
         out.println("</html>");
@@ -46,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 
 
         if (isValidUser(username, password)) {
-            out.println("<head><title>Вход в систему выполнен успешно</title></head>");
+            out.println("<head><title>Logging in is successful</title></head>");
             out.println("<body>");
 
             HttpSession session = request.getSession();
@@ -56,25 +58,25 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("header.jsp").include(request, response);
 
-            out.println("<h1>Вход в систему выполнен успешно</h1>");
-            out.println("<p>Добро пожаловать, " + username + ".</p>");
+            out.println("<h1>Logging in is successful</h1>");
+            out.println("<p>Welcome " + username + ".</p>");
 
             out.println("<form action=\"personal_account\" method=\"get\" accept-charset=\"UTF-8\">");
-            out.println("<input type=\"submit\" value=\"Войти в личный кабинет\">");
+            out.println("<input type=\"submit\" value=\"Sign in\">");
             out.println("</form>");
 
 
         } else {
-            out.println("<head><title>Ошибка входа</title></head>");
+            out.println("<head><title>Login error</title></head>");
             out.println("<body>");
 
             request.getRequestDispatcher("header.jsp").include(request, response);
 
-            out.println("<h1>Ошибка входа</h1>");
-            out.println("<p>Неверное имя пользователя или пароль.</p>");
+            out.println("<h1>Login error</h1>");
+            out.println("<p>Incorrect user name or password.</p>");
 
             out.println("<form action=\"login\" method=\"get\" accept-charset=\"UTF-8\">");
-            out.println("<input type=\"submit\" value=\"Повторить попытку\">");
+            out.println("<input type=\"submit\" value=\"Try again\">");
             out.println("</form>");
         }
         out.println("</body>");
@@ -98,9 +100,9 @@ public class LoginServlet extends HttpServlet {
         PreparedStatement stmt = null;
 
         try {
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks",
-                    "postgres", " ");
+            Props props = new Props();
+            conn = DriverManager.getConnection(props.getUrl(), props.getUser(), props.getPassword());
+
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
@@ -109,7 +111,6 @@ public class LoginServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            // Close the statement and connection
             TaskTableServlet.closeConnection(conn, stmt);
         }
         return isValid;

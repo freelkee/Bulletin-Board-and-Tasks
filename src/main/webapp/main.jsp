@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Доска объявлений и заданий</title>
+    <title>Bulletin board and tasks</title>
 </head>
 <body>
 <jsp:include page="header.jsp"/>
@@ -13,15 +13,14 @@
         firstSession.setAttribute("auth", "false");
         firstSession.setAttribute("username", "unknown");
     }%>
-<h1>Добро пожаловать на доску объявлений и заданий!</h1>
-<p>Здесь вы можете найти или опубликовать объявления о событиях, прямо или косвенно связанных с местом проживания.</p>
-<p>Также вы можете найти или опубликовать задания на различные виды работ, включая уборку, покупкой товаров, переводы и
-    многое другое.</p>
+<h1>Welcome to the job board!</h1>
+<p>Here you can find or post announcements about events directly or indirectly related to where you live.</p>
+<p>You can also find or post jobs for a variety of jobs, including cleaning, shopping, translating, and much more.</p>
 <jsp:include page="announcementtable"/>
 <jsp:include page="tasktable"/>
 <br>
 <% if (!request.getSession().getAttribute("auth").equals("true")) {%>
-<p>Для принятия участия в сервисе необходимо авторизоваться или зарегистрироваться.</p>
+<p>You need to log in or register to take part in the service.</p>
 <%} else {%>
 <jsp:include page="button.jsp"/>
 <%}%>

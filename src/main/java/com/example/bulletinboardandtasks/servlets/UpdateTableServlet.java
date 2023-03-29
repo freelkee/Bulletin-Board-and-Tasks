@@ -1,5 +1,7 @@
 package com.example.bulletinboardandtasks.servlets;
 
+import com.example.bulletinboardandtasks.models.Props;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,9 +37,9 @@ public class UpdateTableServlet extends HttpServlet {
         PreparedStatement stmt = null;
         try {
             // Connect to the database
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/bulletin_board_and_tasks?useUnicode=true&charSet=UTF8",
-                    "postgres", " ");
+            Props props = new Props();
+            conn = DriverManager.getConnection(props.getUrl(), props.getUser(), props.getPassword());
+
             if (request.getParameter("update").equals("takeUp")) {
                 // Create the SQL statement
                 String sql = ("UPDATE tasks set assignee = ?  where id = ?");
@@ -45,7 +47,7 @@ public class UpdateTableServlet extends HttpServlet {
                 stmt.setString(1, (String) request.getSession().getAttribute("username"));
                 stmt.setInt(2, Integer.parseInt(request.getParameter("taskId")));
 
-                // Execute the SQL statement
+
                 stmt.executeUpdate();
 
             } else if (request.getParameter("update").equals("rejection")) {
@@ -55,32 +57,31 @@ public class UpdateTableServlet extends HttpServlet {
                 stmt.setString(1, "");
                 stmt.setInt(2, Integer.parseInt(request.getParameter("taskId")));
 
-                // Execute the SQL statement
                 stmt.executeUpdate();
 
 
             } else if (request.getParameter("update").equals("done")) {
-                // Create the SQL statement
+
                 String sql = ("UPDATE tasks set is_done = ?  where id = ?");
                 stmt = conn.prepareStatement(sql);
                 stmt.setBoolean(1, true);
                 stmt.setInt(2, Integer.parseInt(request.getParameter("taskId")));
 
-                // Execute the SQL statement
+
                 stmt.executeUpdate();
 
                 sql = ("UPDATE users set completed = completed + 1 where username = ?");
                 stmt = conn.prepareStatement(sql);
                 stmt.setString(1, (String) request.getSession().getAttribute("username"));
-                // Execute the SQL statement
+
                 stmt.executeUpdate();
             }else if (request.getParameter("update").equals("deleteAnnouncement")) {
-                // Create the SQL statement
+
                 String sql = ("DELETE from announcements where id = ?");
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, Integer.parseInt(request.getParameter("taskId")));
 
-                // Execute the SQL statement
+
                 stmt.executeUpdate();
 
             }
@@ -89,7 +90,6 @@ public class UpdateTableServlet extends HttpServlet {
             e.printStackTrace();
 
         } finally {
-            // Close the statement and connection
             TaskTableServlet.closeConnection(conn, stmt);
         }
         response.sendRedirect("main.jsp");
